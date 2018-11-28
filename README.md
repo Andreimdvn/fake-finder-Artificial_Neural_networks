@@ -1,2 +1,10 @@
-# fake-finder-Artificial_Neural_networks
-Detecting fake logos using Neural networks
+data/*
+*/.idea/*
+*.pyc
+*.log
+*.exe
+*.zip
+*.rar
+*.tar.gz
+**/config.json
+*.orig
