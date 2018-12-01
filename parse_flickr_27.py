@@ -41,7 +41,7 @@ def extract_images(config, source, destination, logo_class):
                         config_entries += 1
                         fout.write(line)
                     except Exception as ex:
-                        print("ERROR: Ex: {}, Traceback: {}".format(ex, traceback.format_exc))
+                        print("ERROR: Ex: {}, Traceback: {}".format(ex, traceback.format_exc()))
 
     print("Total config_entries: {}. Total files {} files".format(config_entries, count))
 
