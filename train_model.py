@@ -14,7 +14,8 @@ def create_model(input_dimension):
     # use dropout to prevent overfitting
     model.add(Dense(units=32, activation=keras.activations.relu, input_dim=input_dimension))  # input dim = input_dimension
                     # kernel_initializer=keras.initializers.RandomNormal))
-    model.add(Dense(units=32, activation=keras.activations.sigmoid))
+    model.add(Dense(units=256, activation=keras.activations.sigmoid))
+    model.add(Dense(units=256, activation=keras.activations.sigmoid))
     model.add(Dense(units=1, activation=keras.activations.sigmoid))
 
     # For a binary classification problem
@@ -43,15 +44,14 @@ def get_file_data(file_config):
             elif class_name == "Pepsi":
                 y_lst.append(numpy.array([1]))
             image_path = os.path.join(source_folder, image)
-            x_lst.append([surf_image.surf_extract_features(image_path)])
+            x_lst.append(list(surf_image.surf_extract_features(image_path)))
 
             # x_nd = surf_image.surf_extract_features(image_path)
             # x_lst.append(x_nd.reshape(x_nd.shape[0], 1))
 
     x_np_array = numpy.array(x_lst)
     y_np_array = numpy.array(y_lst)
-    print("File data: \nx: shape: {}, y: shape: {}, \ndata: x: {},\n\n y: {}"
-          .format(x_np_array.shape, y_np_array.shape, x_np_array, y_np_array))
+    print("File data: \nx: shape: {}, y: shape: {}".format(x_np_array.shape, y_np_array.shape))
 
     return x_np_array, y_np_array
 
@@ -74,7 +74,8 @@ def train_model(model, x_train_data, y_train_data):
     print("Training model. x: {}, y: {}\n Start time: {}".format(x_train_data.shape, y_train_data.shape, start_time))
 
     # shuffle data before epochs
-    model_history = model.fit(x_train_data, y_train_data, shuffle=True, epochs=3)
+    print("x_train_data shape: {}. y_train_data shape: {}".format(x_train_data.shape, y_train_data.shape))
+    model_history = model.fit(x_train_data, y_train_data, shuffle=True, epochs=100)
 
     end_time = datetime.datetime.today()
     print("End of training.\n End time: {}\n Duration: {}\nModel history:{}"
@@ -83,7 +84,8 @@ def train_model(model, x_train_data, y_train_data):
 
 def test_model(model, x_test_data, y_test_data):
     print("Evaluating model with {} input data".format(len(x_test_data)))
-    evaluate_status = model.evaluate(x_test_data, y_test_data)
+    evaluate_status = model.evaluate(x_test_data, y_test_data, verbose=1)
+    print("Metrics names: {}".format(model.metrics_names))
     print("Done evaluating. Status: {}".format(evaluate_status))
 
 
@@ -91,7 +93,7 @@ def main(train_file_config, test_file_config):
     dump_model_file = "model.cfg"
 
     x_train_data, y_train_data = get_file_data(train_file_config)
-    model = create_model(input_dimension=len(x_train_data[0]))
+    model = create_model(input_dimension=x_train_data.shape[1])
     train_model(model, x_train_data, y_train_data)
 
     keras.utils.print_summary(model)

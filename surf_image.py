@@ -13,7 +13,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 
-def surf_extract_features(image, features=128, threshold=400, plot_image=False):
+def surf_extract_features(image, features=32, threshold=400, plot_image=False):
     """
     Uses surf to search for features in the image
     :param image: image file path
@@ -35,13 +35,13 @@ def surf_extract_features(image, features=128, threshold=400, plot_image=False):
     dsc = dsc.flatten()  # make it a 1d array
     if len(kps) < features:
         print("Adding 0 padding for {}/{} necessary features".format(features - len(kps), len(kps)))
-        dsc = numpy.concatenate([dsc, numpy.zeros(features - len(kps))])
+        dsc = numpy.concatenate([dsc, numpy.zeros((features - len(kps))*64)])
 
     if plot_image:
         img2 = cv2.drawKeypoints(img, kps, None, (255, 0, 0), 4)
         plt.imshow(img2), plt.show()
 
-    print("Returning descriptor vector: len:{}(features: {}), data: {}".format(len(dsc), len(kps), dsc))
+    print("Returning descriptor vector: shape:{}(features: {}), data: {}".format(dsc.shape, len(kps), dsc))
 
     return dsc
 
