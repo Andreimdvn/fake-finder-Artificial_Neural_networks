@@ -4,30 +4,47 @@ from random import shuffle
 
 
 def main(cfg_file):
-    img_dict = {}
+    images_for_class = {}
     with open(cfg_file) as fin:
         for line in fin:
-            image_name, logo_class, _, _, _, _, _ = line.strip().split()
-            if image_name not in img_dict:
-                img_dict[image_name] = logo_class
+            my_line = line.strip().split()
+            if len(my_line) == 2:
+                image_name, logo_class = my_line
+            else:
+                image_name, logo_class, _, _, _, _, _ = my_line
+            if logo_class not in images_for_class:
+                images_for_class[logo_class] = []
+            if image_name not in images_for_class[logo_class]:
+                images_for_class[logo_class].append(image_name)
 
-    all_keys = list(img_dict.keys())
-    shuffle(all_keys)
-    train_keys = all_keys[:int(0.7*len(all_keys))]
-    test_keys = all_keys[int(0.7*len(all_keys)):]
+    train_tuples = []
+    test_tuples = []
 
-    with open(cfg_file+"_train.sample", "w") as fout:
-        for key in train_keys:
-            fout.write("{} {}\n".format(key, img_dict[key]))
+    for logo_class in images_for_class.keys():
+        images = images_for_class[logo_class]
+        # print(images[:int(0.7*len(images))])
+        shuffle(images)
+        train_tuples += [(image, logo_class) for image in images[:int(0.7*len(images))]]
+        test_tuples += [(image, logo_class) for image in images[int(0.7*len(images)):]]
 
-    with open(cfg_file+"_test.sample", "w") as fout:
-        for key in test_keys:
-            fout.write("{} {}\n".format(key, img_dict[key]))
+    shuffle(train_tuples)
+
+    print(test_tuples)
+
+    out_file_base = os.path.splitext(cfg_file)[0]
+    with open(out_file_base+".train", "w") as fout:
+        for image, logo in train_tuples:
+            fout.write("{} {}\n".format(image, logo))
+
+    with open(out_file_base+".test", "w") as fout:
+        for image, logo in test_tuples:
+            fout.write("{} {}\n".format(image, logo))
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        print("Takes a config and reduces it to single logo per image => train + test 70 - 30")
+        print("Takes a config and reduces it to single logo per image => train + test 70 - 30 taking into account equal"
+              " logo distribution")
         print("Usage: py simplify_cfg cfg_path")
         sys.exit(1)
 

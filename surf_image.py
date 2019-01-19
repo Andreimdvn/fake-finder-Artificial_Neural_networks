@@ -12,8 +12,10 @@ import sys
 import cv2
 import matplotlib.pyplot as plt
 
+f = open("features.txt",'w')
 
-def surf_extract_features(image, features=32, threshold=400, plot_image=False):
+
+def surf_extract_features(image, features=512, threshold=400, plot_image=False):
     """
     Uses surf to search for features in the image
     :param image: image file path
@@ -28,10 +30,17 @@ def surf_extract_features(image, features=32, threshold=400, plot_image=False):
     surf = cv2.xfeatures2d.SURF_create(threshold)
     kps = surf.detect(img)
     print("Features found: {}. Needed: {}".format(len(kps), features))
+    features_found = len(kps)
+    f.write("{}\n".format(len(kps)))
     #  best key points based on response
     kps = sorted(kps, key=lambda x: x.response, reverse=True)[:features]
 
     kps, dsc = surf.compute(img, kps)
+    out_file = open("wtf_output.txt", 'w')
+    if dsc is None:
+        print("\n\n\nwtf {}\n\n\n".format(image))
+        out_file.write("!!! ERROR AT IMAGE SURF {}\n".format(image))
+        return [0] * (features * 64), 0
     dsc = dsc.flatten()  # make it a 1d array
     if len(kps) < features:
         print("Adding 0 padding for {}/{} necessary features".format(features - len(kps), len(kps)))
@@ -41,9 +50,9 @@ def surf_extract_features(image, features=32, threshold=400, plot_image=False):
         img2 = cv2.drawKeypoints(img, kps, None, (255, 0, 0), 4)
         plt.imshow(img2), plt.show()
 
-    print("Returning descriptor vector: shape:{}(features: {}), data: {}".format(dsc.shape, len(kps), dsc))
+    # print("Returning descriptor vector: shape:{}(features: {}), data: {}".format(dsc.shape, len(kps), dsc))
 
-    return dsc
+    return dsc, features_found
 
 
 if __name__ == '__main__':

@@ -1,0 +1,12 @@
+protobuf==3.6.0
+tensorflow-gpu==1.10
+keras
+matplotlib
+numpy
+scipy
+scikit-learn
+opencv-python==3.3.0.10
+opencv-contrib-python==3.3.0.10
+pydot
+pillow
+imutils
